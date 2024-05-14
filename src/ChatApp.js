@@ -27,24 +27,32 @@ const ChatBox = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get('https://jsonplaceholder.typicode.com/comments');
-      const randomIndex = Math.floor(Math.random() * response.data.length);
-      const botResponse = response.data[randomIndex].name;
+      const response = await axios.get('https://dummyjson.com/comments');
+      if (response && response.data && response.data.comments && response.data.comments.length > 0) {
+        const randomIndex = Math.floor(Math.random() * response.data.comments.length);
+        const botResponse = response.data.comments[randomIndex].body;
 
-      const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      const updatedHistory = [
-        ...chatHistory,
-        { sender: 'user', text: message, time: formattedTime },
-        { sender: 'bot', text: botResponse, time: formattedTime }
-      ];
-      setChatHistory(updatedHistory);
-      saveChatHistory(updatedHistory);
-      setMessage('');
+        const updatedHistory = [
+          ...chatHistory,
+          { sender: 'user', text: message, time: formattedTime },
+          { sender: 'bot', text: botResponse, time: formattedTime }
+        ];
+        setChatHistory(updatedHistory);
+        saveChatHistory(updatedHistory);
+        setMessage('');
+      } else {
+        console.error('Invalid response format:', response);
+      }
     } catch (error) {
       console.error('Error fetching chat response:', error);
     }
   };
+
+  useEffect(() => {
+    setChatHistory([]);
+  }, []);
 
   return (
     <div className="chat-container">
